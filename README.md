@@ -6,7 +6,7 @@ https://tranchausky.github.io/led7219-matrix-editor/
 
 # functions
 - check uncheck led
-- create/remove table
+- add/remove more led7219
 - export all, copy fast
 - javascript code
 - play export
