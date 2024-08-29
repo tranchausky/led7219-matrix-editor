@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Led7219 matrix editor</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <button id="add-table">Add Table</button>
+    <button id="export-tables">Export Tables</button>
+    <button id="playexport">Play export</button>
+    <div id="tables-container">
+    </div>
+    <div id="export-all">
+        <textarea name="" id="export-hex-col" cols="100" rows="3" readonly></textarea>
+    </div>
+    <div id="export-container">
+        <div id="exported-data" style="white-space: pre-wrap; margin: 20px;"></div> <!-- Container for exported data -->
+    </div>
+
+    <div id="toast">Text copied to clipboard!</div>
+
+    <script src="script.js"></script>
+</body>
+</html>
