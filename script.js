@@ -320,6 +320,9 @@ var timeplay = 500;
 
     // Initial table
     createTable();
+    createTable();
+    createTable();
+    createTable();
 });
 
 function triggerCellClick(atindexTable,rowIndex, colIndex) {
