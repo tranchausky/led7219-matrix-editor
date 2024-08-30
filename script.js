@@ -1,5 +1,6 @@
-// script.js
 
+// script.js
+var isMouseDown = false;
 document.addEventListener("DOMContentLoaded", function() {
     const addTableButton = document.getElementById("add-table");
     const exportTablesButton = document.getElementById("export-tables");
@@ -21,6 +22,25 @@ document.addEventListener("DOMContentLoaded", function() {
                 cell.textContent = `${i + 1},${j + 1}`;
                 cell.addEventListener("click", function () {
                     cell.classList.toggle("active");
+                    // isMouseDown = !isMouseDown;
+                });
+                cell.addEventListener("dblclick", function () {
+                    // cell.classList.toggle("active");
+                    isMouseDown = !isMouseDown;
+                });
+                // cell.addEventListener('mouseover', function () {
+                //     cell.classList.toggle("active");
+                // });
+                cell.addEventListener('mousedown', function (event) {
+                    if (event.button === 0) { // Check if the left mouse button (button 0) is pressed
+                        //isMouseDown = true; // Set mouse down state to true
+                        // cell.classList.toggle("active");
+                    }
+                });
+                cell.addEventListener('mouseenter', function () {
+                    if (isMouseDown) { // If mouse button is still held down, toggle 'active' class
+                        cell.classList.toggle('active');
+                    }
                 });
                 row.appendChild(cell);
             }
@@ -34,12 +54,26 @@ document.addEventListener("DOMContentLoaded", function() {
             tablesContainer.removeChild(tableContainer);
         });
 
+        const emptyButton = document.createElement("button");
+        emptyButton.textContent = "Empty";
+        emptyButton.className = "empty-table";
+        emptyButton.addEventListener("click", function () {
+            // tablesContainer.removeChild(tableContainer);
+            const cells = tableContainer.querySelectorAll('td');
+            cells.forEach(cell => {
+                cell.classList.remove('active'); // Remove 'active' class if present
+            });
+        });
+
         tableContainer.appendChild(removeButton);
+        tableContainer.appendChild(emptyButton);
         tableContainer.appendChild(table);
         tablesContainer.appendChild(tableContainer);
+
+        // addToggleEffect();
     }
-var playInterval;
-var timeplay = 500;
+    var playInterval;
+    var timeplay = 500;
     function playExports() {
         console.log('play')
         const length = document.querySelectorAll('#exported-data > div').length;
@@ -120,6 +154,9 @@ var timeplay = 500;
             exportData += rowData + "\n";
         }
 
+        elementForExport(exportData);
+    }
+    function elementForExport(exportData){
         const newLine = document.createElement("div");
         // newLine.textContent = exportData;
         newLine.draggable = true; // Make div draggable
@@ -164,6 +201,7 @@ var timeplay = 500;
         removeLink.className = "remove-line";
         removeLink.addEventListener("click", function () {
             exportedDataPre.removeChild(newLine);
+            getToLink();
         });
 
         newLine.appendChild(importspanContent);
@@ -176,11 +214,8 @@ var timeplay = 500;
         // Add drag and drop event listeners
         addDragAndDropHandlers(newLine);
 
-        const elements = document.querySelectorAll('.import-hex-col');
-        const htmlString = Array.from(elements)
-        .map(element => element.innerHTML)
-        .join(',');
-        document.getElementById('export-hex-col').value = htmlString;
+        
+        getToLink();
     }
 
     function copyTextToClipboard(text) {
@@ -244,6 +279,7 @@ var timeplay = 500;
     }
 
     function importData(data, newLine) {
+        console.log(data,newLine)
         const exportedDataDivs = document.querySelectorAll('#exported-data > div');
         // Iterate over each div and remove the 'active' class
         exportedDataDivs.forEach(div => {
@@ -314,6 +350,34 @@ var timeplay = 500;
         }
     }
 
+    /**
+     * with v set content for view restore
+     */
+    function getLinkVersion(){
+        const urlParams = new URLSearchParams(window.location.search);
+        var atV = urlParams.get('v');
+        console.log(atV);
+        if(atV !=null){
+            console.log(atV);
+            //console.log(reverseConvertString(atV));
+            var listHexCol = reverseConvertString(atV);
+            console.log(listHexCol);
+            const lines = listHexCol.trim().split(",");
+
+            for(var i=0; i<lines.length;i++){
+                var binaryForImport = hexToData_ColData(lines[i]);
+                console.log(binaryForImport);
+                elementForExport(binaryForImport);
+            }
+            //click import to view first
+            const importLines = document.querySelectorAll('.import-line');
+            if (importLines.length > 0) {
+                const firstImportLine = importLines[0];
+                firstImportLine.click();
+            }
+        }
+    }
+
     addTableButton.addEventListener("click", createTable);
     exportTablesButton.addEventListener("click", exportTables);
     playexportButton.addEventListener("click", playExports);
@@ -323,6 +387,9 @@ var timeplay = 500;
     createTable();
     createTable();
     createTable();
+    // addToggleEffect();
+
+    getLinkVersion();
 });
 
 function triggerCellClick(atindexTable,rowIndex, colIndex) {
@@ -333,10 +400,13 @@ function triggerCellClick(atindexTable,rowIndex, colIndex) {
     for (let table of tables) {
         if(atindexTable == attable){
             const rows = table.querySelectorAll("tr");
+            // console.log(rows);
             if (rowIndex < rows.length) {
                 const cells = rows[rowIndex].querySelectorAll("td");
+                // console.log(cells);
                 if (colIndex < cells.length) {
                     const cell = cells[colIndex];
+                    // console.log(cell);
                     cell.click(); // Trigger the click event
                     return; // Exit the function after triggering the click
                 }
@@ -413,17 +483,17 @@ function dataToHex_ColData(inputData){
             }
         }
     }
-console.log(cols)
-    // Convert each column to a binary string and then to a hexadecimal value
-const hexValues = cols.map(col => {
-    // Convert column array to binary string
-    const binaryString = col.join('');
-    console.log(binaryString)
-    // Ensure the binary string is interpreted as an 8-bit number
-    const hexValue = parseInt(binaryString, 2).toString(16).toUpperCase().padStart(2, '0');
-    
-    return hexValue;
-});
+    console.log(cols)
+        // Convert each column to a binary string and then to a hexadecimal value
+    const hexValues = cols.map(col => {
+        // Convert column array to binary string
+        const binaryString = col.join('');
+        console.log(binaryString)
+        // Ensure the binary string is interpreted as an 8-bit number
+        const hexValue = parseInt(binaryString, 2).toString(16).toUpperCase().padStart(2, '0');
+        
+        return hexValue;
+    });
     console.log(hexValues)
     var str = hexValues.join('');
     return str;
@@ -431,3 +501,141 @@ const hexValues = cols.map(col => {
 function removeLineComma(inputString){
     return inputString.replace(/[\n\r,]/g, '');
 }
+
+function hexToData_ColData(hexString) {
+    console.log(hexString);
+    // Step 1: Split the hex string into pairs (2 characters each)
+    const hexPairs = hexString.match(/.{1,2}/g);
+    console.log(hexPairs);
+
+    // Step 2: Convert each hex pair back to a binary string, ensuring each binary string is 8 bits
+    const binaryColumns = hexPairs.map(hex => {
+        const binaryString = parseInt(hex, 16).toString(2).padStart(8, '0');
+        return binaryString.split(''); // Convert to an array of bits (characters)
+    });
+    console.log(binaryColumns);
+
+    // Step 3: Initialize an array to hold the row data (rows need to be reconstructed by transposing the columns)
+    const rows = Array.from({ length: binaryColumns[0].length }, () => []);
+
+    // Step 4: Transpose the binary column data back to row data
+    for (let i = 0; i < binaryColumns.length; i++) {
+        for (let j = 0; j < binaryColumns[i].length; j++) {
+            rows[j][i] = binaryColumns[i][j];
+        }
+    }
+    console.log(rows);
+
+    // Step 5: Join the rows and convert each row to a comma-separated string
+    const result = rows.map(row => row.join(',')).join('\n');
+    return result;
+}
+
+
+//////////////////////////
+//hex to mini
+function convertString(input) {
+    let result = '';
+    let countF = 0;
+    let count0 = 0;
+
+    for (let i = 0; i < input.length; i++) {
+        if (input[i] === 'F') {
+            if (count0 > 0) {
+                // Process '0' sequence
+                result += count0 > 4 ? `y${count0}y` : '0'.repeat(count0);
+                count0 = 0;
+            }
+            countF++;
+        } else if (input[i] === '0') {
+            if (countF > 0) {
+                // Process 'F' sequence
+                result += countF > 4 ? `u${countF}u` : 'F'.repeat(countF);
+                countF = 0;
+            }
+            count0++;
+        } else {
+            // Handle any other characters
+            if (countF > 0) {
+                result += countF > 4 ? `u${countF}u` : 'F'.repeat(countF);
+                countF = 0;
+            }
+            if (count0 > 0) {
+                result += count0 > 4 ? `y${count0}y` : '0'.repeat(count0);
+                count0 = 0;
+            }
+            result += input[i];
+        }
+    }
+
+    // Process any remaining 'F' or '0' sequences
+    if (countF > 0) {
+        result += countF > 4 ? `u${countF}u` : 'F'.repeat(countF);
+    }
+    if (count0 > 0) {
+        result += count0 > 4 ? `y${count0}y` : '0'.repeat(count0);
+    }
+
+    return result;
+}
+
+//mini to hex
+function reverseConvertString(input) {
+    let result = '';
+    let i = 0;
+
+    while (i < input.length) {
+        if (input[i] === 'u' || input[i] === 'y') {
+            let char = input[i];
+            let j = i + 1;
+            // Find the end of the number sequence
+            while (j < input.length && !isNaN(input[j])) {
+                j++;
+            }
+            if (j < input.length && input[j] === char) {
+                // Extract the number and repeat the character
+                const count = parseInt(input.slice(i + 1, j), 10);
+                result += char === 'u' ? 'F'.repeat(count) : '0'.repeat(count);
+                i = j + 1;
+            } else {
+                // Handle invalid format
+                result += char;
+                i++;
+            }
+        } else {
+            result += input[i];
+            i++;
+        }
+    }
+
+    return result;
+}
+
+function getToLink(){
+    const elements = document.querySelectorAll('.import-hex-col');
+    const htmlString = Array.from(elements)
+    .map(element => element.innerHTML)
+    .join(',');
+    document.getElementById('export-hex-col').value = htmlString;
+    //htmlString = htmlString.replace(/,/g, ''); //xoa cac phay
+    var mini = convertString(htmlString);
+    console.log(mini);
+    document.getElementById('export-hex-mini').value = mini;
+
+    // var linkat = window.location.href;
+    // var newLink = linkat+'&v='+mini
+    // console.log(newLink);
+
+    var baseUrl = window.location.href;
+    let url = new URL(baseUrl);
+    let params = new URLSearchParams(url.search);
+    params.set('v', mini);
+    url.search = params.toString();
+    let updatedUrl = url.toString();
+    console.log(updatedUrl);
+
+    //const newUrl = 'https://code.home3w.com/viewhtml/?code=cBFugrwWTpx9&v=8y15y111';
+    window.history.pushState({ path: updatedUrl }, '', updatedUrl);
+}
+
+
