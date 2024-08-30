@@ -3,6 +3,14 @@ body {
     font-family: Arial, sans-serif;
 }
 
+.list-menu{
+    display: flex; gap: 29px; list-style: disc;
+}
+.list-menu li::marker {
+  /* content: '☂ '; */
+  content: '☂';
+  font-size: 1.2em;
+}
 button {
     margin: 20px;
 }
