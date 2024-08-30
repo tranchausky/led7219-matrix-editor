@@ -11,8 +11,9 @@ body {
   content: '☂';
   font-size: 1.2em;
 }
+
 button {
-    margin: 20px;
+    margin: 17px 2px;
 }
 
 #tables-container {
@@ -51,6 +52,10 @@ td {
     background: #808080 radial-gradient(ellipse at 42% 42%, #999999 0%, #808080 50%);
     background: #7f7f7f;
     color: #7f7f7f;
+
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
 }
 
 td.active {
