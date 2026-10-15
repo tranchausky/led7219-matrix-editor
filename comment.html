@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Share LED matrix designs, discover ideas, and exchange feedback with the LED Editor community.">
+    <meta name="color-scheme" content="light">
+    <title>Community · LED Matrix Editor</title>
+    <link rel="canonical" href="https://tranchausky.github.io/led7219-matrix-editor/comment.html">
+    <link rel="stylesheet" href="comment.css">
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="index.html"><span class="brand-icon" aria-hidden="true">▦</span> LED Editor <span class="brand-tag">COMMUNITY</span></a>
+        <a class="back-link" href="index.html"><span aria-hidden="true">←</span> Open editor</a>
+    </header>
+    <main>
+        <section class="hero" aria-labelledby="page-title">
+            <div class="hero-copy">
+                <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> A CREATIVE SPACE FOR LED MATRIX</p>
+                <h1 id="page-title">Every pixel,<br>a new idea<span class="accent">.</span></h1>
+                <p class="intro">Show off your latest LED design, find inspiration for your next display, or help bring an idea to life.</p>
+                <a class="primary-link" href="#discussion"><span aria-hidden="true">💬</span> Share your design <span aria-hidden="true">↓</span></a>
+            </div>
+            <div class="matrix-art" aria-hidden="true">
+                <div class="pixel-heart">♥</div>
+                <span>SMALL PIXELS. BIG IDEAS.</span>
+            </div>
+        </section>
+        <section class="share-guide" aria-labelledby="guide-title">
+            <div><p class="eyebrow">FROM EDITOR TO COMMUNITY</p><h2 id="guide-title">Share in 3 simple steps</h2></div>
+            <ol>
+                <li><span class="step">01</span><div><strong>Create something you love</strong><p>Draw a pattern or create an animation in LED Editor.</p></div></li>
+                <li><span class="step">02</span><div><strong>Copy share link</strong><p>Click Copy share link in the editor to get your design link.</p></div></li>
+                <li><span class="step">03</span><div><strong>Paste it in a comment</strong><p>Add a design name, LED dimensions, and a short introduction.</p></div></li>
+            </ol>
+        </section>
+        <section class="discussion" id="discussion" aria-labelledby="discussion-title">
+            <div class="discussion-heading"><span class="discussion-icon" aria-hidden="true">✦</span><div><h2 id="discussion-title">Share ideas & feedback</h2><p>New designs, questions, and little sparks of inspiration are all welcome.</p></div></div>
+            <p class="community-note">Tip: include your display type (8×8, P10 32×16…) so others can try your design. Keep feedback friendly and respect the creators.</p>
+            <div id="disqus_thread"></div>
+            <p id="disqus-error" hidden>Comments could not be loaded. Reload the page or check your content blocker, then try again.</p>
+            <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        </section>
+    </main>
+    <footer><span>LED Editor <span aria-hidden="true">✦</span> Made for your next bright idea.</span><a href="index.html">Back to LED Editor <span aria-hidden="true">↗</span></a></footer>
+    <script>
+        var disqus_config = function () {
+            this.page.url = 'https://tranchausky.github.io/led7219-matrix-editor/comment.html';
+            this.page.identifier = 'lededitor-community';
+        };
+        (function () {
+            var d = document, s = d.createElement('script');
+            s.src = 'https://lededitor.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            s.onerror = function () { d.getElementById('disqus-error').hidden = false; };
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+</body>
+</html>
