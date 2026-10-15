@@ -1,6 +1,8 @@
 
 // script.js
 var isMouseDown = false;
+var matrixWidth = 8;
+var matrixHeight = 8;
 document.addEventListener("DOMContentLoaded", function() {
     const addTableButton = document.getElementById("add-table");
     const exportTablesButton = document.getElementById("export-tables");
@@ -14,10 +16,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const table = document.createElement("table");
 
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < matrixHeight; i++) {
             const row = document.createElement("tr");
 
-            for (let j = 0; j < 8; j++) {
+            for (let j = 0; j < matrixWidth; j++) {
                 const cell = document.createElement("td");
                 cell.textContent = `${i + 1},${j + 1}`;
                 cell.addEventListener("click", function () {
@@ -75,7 +77,6 @@ document.addEventListener("DOMContentLoaded", function() {
     var playInterval;
     var timeplay = 500;
     function playExports() {
-        console.log('play')
         const length = document.querySelectorAll('#exported-data > div').length;
         if(length <=1){
             return;
@@ -100,7 +101,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 exportedDataDivs.forEach(div => {
                     div.classList.remove('active');
                 });
-                console.log(nexIndex);
                 exportedDataDivs[nexIndex].classList.add('active');
                 //return;
                 showAtExportActive();
@@ -138,10 +138,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function exportTables() {
         const tables = tablesContainer.querySelectorAll("table");
+        if (!tables.length) return;
         let exportData = "";
         const tableCount = tables.length;
-        const rowCount = 8; // Number of rows per table
-        const colCount = 8; // Number of columns per table
+        const rowCount = matrixHeight; // Number of rows per table
+        const colCount = matrixWidth; // Number of columns per table
 
         for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
             let rowData = "";
@@ -186,7 +187,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
 
         var hex = binaryToHex_RowData(removeLineComma(exportData));
-        console.log(hex)
 
 
         const importButton = document.createElement("span");
@@ -201,6 +201,7 @@ document.addEventListener("DOMContentLoaded", function() {
         removeLink.className = "remove-line";
         removeLink.addEventListener("click", function () {
             exportedDataPre.removeChild(newLine);
+            stopPlayback();
             getToLink();
         });
 
@@ -250,6 +251,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         line.addEventListener("dragend", function (e) {
             e.target.classList.remove("dragging");
+            getToLink();
         });
 
         line.addEventListener("dragover", function (e) {
@@ -279,7 +281,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function importData(data, newLine) {
-        console.log(data,newLine)
         const exportedDataDivs = document.querySelectorAll('#exported-data > div');
         // Iterate over each div and remove the 'active' class
         exportedDataDivs.forEach(div => {
@@ -293,8 +294,8 @@ document.addEventListener("DOMContentLoaded", function() {
         if (lines.length === 0) return;
 
         // Calculate number of tables needed
-        const rowCount = 8; // Number of rows per table
-        const colCount = 8; // Number of columns per table
+        const rowCount = matrixHeight; // Number of rows per table
+        const colCount = matrixWidth; // Number of columns per table
         const cellsPerTable = rowCount * colCount;
         const totalCells = lines.reduce((sum, line) => sum + (line ? line.split(",").length : 0), 0);
         const tableCount = Math.ceil(totalCells / cellsPerTable);
@@ -310,43 +311,15 @@ document.addEventListener("DOMContentLoaded", function() {
             var atindexTable;
             var atvalue;
             for (let col = 0; col < rowData.length; col++) {
-                atindexTable = Math.ceil((col+1)/8)-1;
+                atindexTable = Math.floor(col / matrixWidth);
                 atvalue = rowData[col];
                 // console.log(atindexTable,atvalue,line,col)
                 if(atvalue == '1'){
                     var atline = line;
-                    var atcol = col-(8*atindexTable)
+                    var atcol = col-(matrixWidth*atindexTable)
                     triggerCellClick(atindexTable,atline,atcol)
                 }
             }
-        }
-        return;
-
-        let cellIndex = 0;
-
-        for (let tableIndex = 0; tableIndex < tableCount; tableIndex++) {
-            const table = document.createElement("table");
-
-            for (let row = 0; row < rowCount; row++) {
-                const tableRow = document.createElement("tr");
-
-                for (let col = 0; col < colCount; col++) {
-                    const cell = document.createElement("td");
-                    let cellValue = "0"; // Default value
-                    if (lines[cellIndex]) {
-                        const rowData = lines[cellIndex].split(",");
-                        cellValue = rowData[col] || "0"; // Get value or default to "0"
-                    }
-                    cell.classList.toggle("active", cellValue === "1");
-                    cell.textContent = `${row + 1},${col + 1}`; // Example content
-                    tableRow.appendChild(cell);
-                    cellIndex++;
-                }
-
-                table.appendChild(tableRow);
-            }
-
-            tablesContainer.appendChild(table);
         }
     }
 
@@ -356,19 +329,19 @@ document.addEventListener("DOMContentLoaded", function() {
     function getLinkVersion(){
         const urlParams = new URLSearchParams(window.location.search);
         var atV = urlParams.get('v');
-        console.log(atV);
-        if(atV !=null){
-            console.log(atV);
+        const w = Number(urlParams.get('w') || 8);
+        const h = Number(urlParams.get('h') || 8);
+        if (!validSize(w, h)) throw new Error('Invalid matrix size in link');
+        matrixWidth = w;
+        matrixHeight = h;
+        updateSizeInputs();
+        if(atV){
             //console.log(reverseConvertString(atV));
             var listHexCol = reverseConvertString(atV);
-            console.log(listHexCol);
             const lines = listHexCol.trim().split(",");
 
-            for(var i=0; i<lines.length;i++){
-                var binaryForImport = hexToData_ColData(lines[i]);
-                console.log(binaryForImport);
-                elementForExport(binaryForImport);
-            }
+            const decodedFrames = lines.map(hexToData_ColData);
+            decodedFrames.forEach(elementForExport);
             //click import to view first
             const importLines = document.querySelectorAll('.import-line');
             if (importLines.length > 0) {
@@ -382,6 +355,65 @@ document.addEventListener("DOMContentLoaded", function() {
     exportTablesButton.addEventListener("click", exportTables);
     playexportButton.addEventListener("click", playExports);
 
+    function validSize(w, h) {
+        return Number.isInteger(w) && Number.isInteger(h) && w >= 1 && w <= 128 && h >= 1 && h <= 128;
+    }
+    function updateSizeInputs() {
+        document.getElementById('matrix-width').value = matrixWidth;
+        document.getElementById('matrix-height').value = matrixHeight;
+    }
+    function stopPlayback() {
+        clearInterval(playInterval);
+        playInterval = null;
+        playexportButton.textContent = 'Play Export';
+    }
+    function resizeData(data, oldWidth, width, height) {
+        const rows = data.trim().split('\n').map(row => row.split(','));
+        const count = Math.ceil(rows[0].length / oldWidth);
+        return Array.from({length: height}, (_, y) => Array.from({length: count * width}, (_, x) => {
+            const localX = x % width;
+            return localX < oldWidth ? (rows[y]?.[Math.floor(x / width) * oldWidth + localX] || '0') : '0';
+        }).join(',')).join('\n');
+    }
+    function applySize() {
+        const width = Number(document.getElementById('matrix-width').value);
+        const height = Number(document.getElementById('matrix-height').value);
+        if (!validSize(width, height)) return;
+        stopPlayback();
+        const current = Array.from(tablesContainer.querySelectorAll('table')).map(table =>
+            Array.from(table.querySelectorAll('tr')).map(row => Array.from(row.children).map(cell => cell.classList.contains('active') ? '1' : '0')));
+        const frames = Array.from(exportedDataPre.querySelectorAll('.import-binary')).map(el => resizeData(el.textContent, matrixWidth, width, height));
+        matrixWidth = width;
+        matrixHeight = height;
+        tablesContainer.innerHTML = '';
+        current.forEach(rows => {
+            createTable();
+            const table = tablesContainer.lastElementChild.querySelector('table');
+            Array.from(table.querySelectorAll('tr')).forEach((row, y) => Array.from(row.children).forEach((cell, x) => cell.classList.toggle('active', rows[y]?.[x] === '1')));
+        });
+        exportedDataPre.innerHTML = '';
+        frames.forEach(elementForExport);
+        getToLink();
+    }
+    document.getElementById('matrix-size').addEventListener('submit', event => { event.preventDefault(); applySize(); });
+    document.getElementById('preset-p10').addEventListener('click', () => {
+        document.getElementById('matrix-width').value = 32;
+        document.getElementById('matrix-height').value = 16;
+        applySize();
+    });
+    document.getElementById('share-link').addEventListener('click', () => {
+        // Include the current drawing if it differs from the exported frames.
+        const before = exportedDataPre.children.length;
+        exportTables();
+        if (exportedDataPre.children.length > before) {
+            const last = exportedDataPre.lastElementChild;
+            const duplicate = Array.from(exportedDataPre.children).slice(0, -1).some(frame => frame.querySelector('.import-binary').textContent === last.querySelector('.import-binary').textContent);
+            if (duplicate) last.remove();
+        }
+        getToLink();
+        copyTextToClipboard(window.location.href);
+    });
+
     // Initial table
     createTable();
     createTable();
@@ -389,11 +421,18 @@ document.addEventListener("DOMContentLoaded", function() {
     createTable();
     // addToggleEffect();
 
-    getLinkVersion();
+    try {
+        getLinkVersion();
+        if (!exportedDataPre.children.length) {
+            tablesContainer.innerHTML = "";
+            for (let i = 0; i < 4; i++) createTable();
+        }
+    } catch (error) {
+        showToast('Cannot open this link: ' + error.message);
+    }
 });
 
 function triggerCellClick(atindexTable,rowIndex, colIndex) {
-    console.log(atindexTable,rowIndex, colIndex)
     // Find the cell based on row and column indices
     const tables = document.querySelectorAll("table");
     var attable = 0;
@@ -468,69 +507,28 @@ function binaryToHex_RowData(binary) {
 
     return hex;
 }
-function dataToHex_ColData(inputData){
-    console.log(inputData)
-    const rows = inputData.split('\n').map(row => row.split(',').map(Number));
-    console.log(rows)
-    // Initialize an array for the columns
-    const cols = Array.from({ length: rows[0].length }, () => []);
-
-    // Fill the columns array by transposing the rows array
-    for (let i = 0; i < rows.length; i++) {
-        if(rows[i].length >1){
-            for (let j = 0; j < rows[i].length; j++) {
-                cols[j][i] = rows[i][j];
-            }
-        }
-    }
-    console.log(cols)
-        // Convert each column to a binary string and then to a hexadecimal value
-    const hexValues = cols.map(col => {
-        // Convert column array to binary string
-        const binaryString = col.join('');
-        console.log(binaryString)
-        // Ensure the binary string is interpreted as an 8-bit number
-        const hexValue = parseInt(binaryString, 2).toString(16).toUpperCase().padStart(2, '0');
-        
-        return hexValue;
-    });
-    console.log(hexValues)
-    var str = hexValues.join('');
-    return str;
+function dataToHex_ColData(inputData) {
+    const rows = inputData.trim().split('\n').map(row => row.split(','));
+    return rows[0].map((_, x) => {
+        const bits = rows.map(row => row[x]).join('');
+        return BigInt('0b' + bits).toString(16).toUpperCase().padStart(Math.ceil(rows.length / 8) * 2, '0');
+    }).join('');
 }
 function removeLineComma(inputString){
     return inputString.replace(/[\n\r,]/g, '');
 }
 
 function hexToData_ColData(hexString) {
-    console.log(hexString);
-    // Step 1: Split the hex string into pairs (2 characters each)
-    const hexPairs = hexString.match(/.{1,2}/g);
-    console.log(hexPairs);
-
-    // Step 2: Convert each hex pair back to a binary string, ensuring each binary string is 8 bits
-    const binaryColumns = hexPairs.map(hex => {
-        const binaryString = parseInt(hex, 16).toString(2).padStart(8, '0');
-        return binaryString.split(''); // Convert to an array of bits (characters)
-    });
-    console.log(binaryColumns);
-
-    // Step 3: Initialize an array to hold the row data (rows need to be reconstructed by transposing the columns)
-    const rows = Array.from({ length: binaryColumns[0].length }, () => []);
-
-    // Step 4: Transpose the binary column data back to row data
-    for (let i = 0; i < binaryColumns.length; i++) {
-        for (let j = 0; j < binaryColumns[i].length; j++) {
-            rows[j][i] = binaryColumns[i][j];
-        }
+    const digits = Math.ceil(matrixHeight / 8) * 2;
+    if (!/^[0-9a-f]+$/i.test(hexString) || hexString.length % (digits * matrixWidth) !== 0 || hexString.length > 1048576) {
+        throw new Error('Invalid frame data');
     }
-    console.log(rows);
-
-    // Step 5: Join the rows and convert each row to a comma-separated string
-    const result = rows.map(row => row.join(',')).join('\n');
-    return result;
+    const columns = [];
+    for (let i = 0; i < hexString.length; i += digits) {
+        columns.push(BigInt('0x' + hexString.slice(i, i + digits)).toString(2).padStart(matrixHeight, '0').slice(-matrixHeight));
+    }
+    return Array.from({length: matrixHeight}, (_, y) => columns.map(col => col[y]).join(',')).join('\n');
 }
-
 
 //////////////////////////
 //hex to mini
@@ -595,6 +593,7 @@ function reverseConvertString(input) {
             if (j < input.length && input[j] === char) {
                 // Extract the number and repeat the character
                 const count = parseInt(input.slice(i + 1, j), 10);
+                if (!Number.isSafeInteger(count) || count > 1048576 || result.length + count > 1048576) throw new Error('Link is too large');
                 result += char === 'u' ? 'F'.repeat(count) : '0'.repeat(count);
                 i = j + 1;
             } else {
@@ -619,7 +618,6 @@ function getToLink(){
     document.getElementById('export-hex-col').value = htmlString;
     //htmlString = htmlString.replace(/,/g, ''); //xoa cac phay
     var mini = convertString(htmlString);
-    console.log(mini);
     document.getElementById('export-hex-mini').value = mini;
 
     // var linkat = window.location.href;
@@ -630,12 +628,13 @@ function getToLink(){
     let url = new URL(baseUrl);
     let params = new URLSearchParams(url.search);
     params.set('v', mini);
+    params.set('w', matrixWidth);
+    params.set('h', matrixHeight);
     url.search = params.toString();
     let updatedUrl = url.toString();
-    console.log(updatedUrl);
 
     //const newUrl = 'https://code.home3w.com/viewhtml/?code=cBFugrwWTpx9&v=8y15y111';
-    window.history.pushState({ path: updatedUrl }, '', updatedUrl);
+    window.history.replaceState({ path: updatedUrl }, '', updatedUrl);
 }
 
 

@@ -16,3 +16,15 @@ https://tranchausky.github.io/led7219-matrix-editor/
 - play export
 
 <img src="images/2024-08-29_153105.jpg">
+
+## Custom matrix sizes and sharing
+
+- Enter Width and Height (1–128 pixels per table), then click Apply size, or use P10 32×16.
+- All tables use the selected size. Add Table adds another panel horizontally in exported data.
+- Resizing preserves the top-left pixels of each panel in the drawing and exported animation frames. Shrinking crops pixels outside the new size.
+- Export Tables adds an animation frame. Copy share link includes the current drawing if it is not already exported, and copies the URL with all exported frames and the panel dimensions.
+- Shared URLs store `w`, `h`, and compressed column data in `v`. Older links without dimensions still use 8×8 panels.
+- Column hex stores each column top-to-bottom as an unsigned integer, padded to `ceil(height / 8)` bytes. For example, a 16-pixel column uses four hex digits. This is bitmap data; hardware-specific P10 scan/wiring conversion is separate.
+- Large drawings or many frames produce longer URLs.
+
+Run codec checks with `node tests/codec.test.cjs`.

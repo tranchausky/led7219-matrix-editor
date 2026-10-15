@@ -12,6 +12,14 @@
         <li><a href="https://tranchausky.github.io/led7219-matrix-editor/?v=2141FF0101y54y%2C2141FF0101C38589F1y46y%2C2141FF0101C38589F1818989FFy38y%2C2141FF0101C38589F1818989FF1828489Fy30y%2C2141FF0101C38589F1818989FF1828489FF98989CFy22y%2C2141FF0101C38589F1818989FF1828489FF98989CFFF8989CFy14y%2C2141FF0101C38589F1818989FF1828489FF98989CFFF8989CF838488Fy7y%2CFF9191FFy56y%2CFF9191FFF19191FFy48y%2CFF9191FFF19191FF003048442244483y33y">Basic number</a></li>
         <li><a href="#">temp</a></li>
     </ul>
+    <form id="matrix-size">
+        <label>Width <input id="matrix-width" type="number" min="1" max="128" value="8" required></label>
+        <label>Height <input id="matrix-height" type="number" min="1" max="128" value="8" required></label>
+        <button type="submit">Apply size</button>
+        <button type="button" id="preset-p10">P10 32×16</button>
+        <p>Size per table (1–128 pixels). Resizing keeps the top-left area; pixels outside the new size are cropped, including exported frames.</p>
+    </form>
+    <button id="share-link">Copy share link</button>
     <button id="add-table">Add Table</button>
     <button id="export-tables">Export Tables</button>
     <button id="playexport">Play export</button>

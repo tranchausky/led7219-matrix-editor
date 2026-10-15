@@ -154,3 +154,11 @@ td.active {
         display: block;
     }
 }
+
+#matrix-size input { width: 72px; margin: 0 12px 0 4px; }
+#matrix-size p { margin: 0; color: #555; }
+#tables-container > div { max-width: 100%; overflow-x: auto; }
+#tables-container table { table-layout: fixed; }
+#tables-container td { min-width: 20px; font-size: 0; }
+textarea { max-width: 100%; box-sizing: border-box; }
+@media (max-width: 600px) { #tables-container td { min-width: 10px; } }
