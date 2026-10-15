@@ -18,7 +18,9 @@ button {
 
 #tables-container {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    width: max-content;
+    align-items: flex-start;
     gap: 0px; /* Add some spacing between tables */
     padding-top: 10px;
     padding-bottom: 10px;
@@ -157,7 +159,15 @@ td.active {
 
 #matrix-size input { width: 72px; margin: 0 12px 0 4px; }
 #matrix-size p { margin: 0; color: #555; }
-#tables-container > div { max-width: 100%; overflow-x: auto; }
+#tables-viewport {
+    max-width: 100%;
+    overflow-x: auto;
+    margin-bottom: 12px;
+}
+#tables-container > div { flex: 0 0 auto; }
+.table-zoom { display: flex; align-items: center; gap: 6px; }
+.table-zoom button { margin: 4px 0; min-width: 36px; padding: 6px 10px; }
+#zoom-level { min-width: 48px; color: #555; }
 #tables-container table { table-layout: fixed; }
 #tables-container td { min-width: 20px; font-size: 0; }
 textarea { max-width: 100%; box-sizing: border-box; }

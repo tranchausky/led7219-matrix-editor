@@ -9,6 +9,23 @@ document.addEventListener("DOMContentLoaded", function() {
     const playexportButton = document.getElementById("playexport");
     const tablesContainer = document.getElementById("tables-container");
     const exportedDataPre = document.getElementById("exported-data");
+    const zoomOutButton = document.getElementById('zoom-out');
+    const zoomInButton = document.getElementById('zoom-in');
+    const zoomLevel = document.getElementById('zoom-level');
+    let tableZoom = 100;
+    function setTableZoom(percent) {
+        const viewport = document.getElementById('tables-viewport');
+        const previousZoom = tableZoom;
+        tableZoom = Math.max(25, Math.min(200, percent));
+        tablesContainer.style.zoom = tableZoom / 100;
+        viewport.scrollLeft *= tableZoom / previousZoom;
+        zoomLevel.textContent = tableZoom + '%';
+        zoomOutButton.disabled = tableZoom === 25;
+        zoomInButton.disabled = tableZoom === 200;
+    }
+    zoomOutButton.addEventListener('click', () => setTableZoom(tableZoom - 25));
+    zoomInButton.addEventListener('click', () => setTableZoom(tableZoom + 25));
+    document.getElementById('zoom-reset').addEventListener('click', () => setTableZoom(100));
 
     function createTable() {
         const tableContainer = document.createElement("div");
